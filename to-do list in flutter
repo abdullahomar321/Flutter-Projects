@@ -1,0 +1,209 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    title: 'TO-DO LIST',
+    home: HomePage(),
+  ));
+}
+
+class Task {
+  String title;
+  bool isDone;
+
+  Task({required this.title, this.isDone = false});
+}
+
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<Task> tasks = [
+    Task(title: "Gym at 4.30 pm"),
+    Task(title: "Study DLD Chapter 5"),
+    Task(title: "Buy groceries"),
+    Task(title: "Call Ali regarding project"),
+  ];
+
+  void _addTask() {
+    TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Add New Task"),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(hintText: 'Enter task name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              String taskText = controller.text.trim();
+              if (taskText.isNotEmpty) {
+                setState(() {
+                  tasks.add(Task(title: taskText));
+                });
+              }
+              Navigator.of(context).pop();
+            },
+            child: Text('Add'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteTask(int index) {
+    setState(() {
+      tasks.removeAt(index);
+    });
+  }
+
+  void _toggleDone(int index) {
+    setState(() {
+      tasks[index].isDone = !tasks[index].isDone;
+    });
+  }
+
+  void _editTask(int index) {
+    TextEditingController controller = TextEditingController();
+    controller.text = tasks[index].title;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Edit Task'),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(hintText: 'Edit task'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                tasks[index].title = controller.text.trim();
+              });
+              Navigator.of(context).pop();
+            },
+            child: Text('Save'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskCard(Task task, int index) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      child: Container(
+        decoration: BoxDecoration(
+          color: task.isDone ? Colors.green[100] : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                child: Text(
+                  task.title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'MyCustomFont',
+                    decoration:
+                    task.isDone ? TextDecoration.lineThrough : null,
+                  ),
+                ),
+              ),
+              SizedBox(height: 25),
+              Divider(color: Colors.lightBlueAccent),
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.edit, color: Colors.blueAccent),
+                      onPressed: () => _editTask(index),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete, color: Colors.redAccent),
+                      onPressed: () => _deleteTask(index),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.done, color: Colors.green),
+                      onPressed: () => _toggleDone(index),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: Colors.lightBlue,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: GestureDetector(
+              onTap: _addTask,
+              child: Icon(Icons.add, color: Colors.black),
+            ),
+          ),
+        ],
+        title: Text(
+          "To-Do List",
+          style: TextStyle(
+            color: Colors.black,
+            fontFamily: 'MyCustomFont',
+            fontSize: 22,
+          ),
+        ),
+        leading: Icon(Icons.menu, color: Colors.black),
+      ),
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 20, top: 40),
+            child: Text(
+              "ALL TASKS",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SizedBox(height: 30),
+          ...tasks.asMap().entries.map(
+                (entry) => _buildTaskCard(entry.value, entry.key),
+          ),
+        ],
+      ),
+    );
+  }
+}
