@@ -1,0 +1,127 @@
+import 'package:flutter/material.dart';
+import 'package:my_fit/selection_screen.dart';
+
+class DayScreen extends StatefulWidget {
+  const DayScreen({super.key});
+
+  @override
+  State<DayScreen> createState() => _DayScreenState();
+}
+
+class _DayScreenState extends State<DayScreen> {
+  final List<String> days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  final Set<String> selectedDays = {};
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Colors.amberAccent,
+            foregroundColor: Colors.black,
+            pinned: true,
+            expandedHeight: 100.0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            actions: selectedDays.length >= 3
+                ? [
+              IconButton(
+                icon: const Icon(Icons.arrow_forward, color: Colors.black),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>selection(days: selectedDays.toList())));
+
+                },
+              )
+            ]
+                : [],
+            flexibleSpace: const FlexibleSpaceBar(
+              centerTitle: true,
+              title: Text(
+                'MyFit',
+                style: TextStyle(
+                  fontFamily: 'Oswald',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'How many Days a week do you workout?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Oswald',
+                        fontSize: 26.5,
+                        color: Colors.amberAccent,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    Wrap(
+                      spacing: 20,
+                      runSpacing: 20,
+                      alignment: WrapAlignment.center,
+                      children: days.map((day) {
+                        final isSelected = selectedDays.contains(day);
+
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              if (isSelected) {
+                                selectedDays.remove(day);
+                              } else {
+                                selectedDays.add(day);
+                              }
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(50),
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isSelected ? Colors.amberAccent : Colors.black,
+                              border: Border.all(
+                                color: Colors.amberAccent,
+                                width: 2,
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              day,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: 'Oswald',
+                                color: isSelected
+                                    ? Colors.black
+                                    : Colors.amberAccent,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
