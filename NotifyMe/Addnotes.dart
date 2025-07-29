@@ -16,7 +16,7 @@ class _AddnotesState extends State<Addnotes> {
     final note = _controller.text.trim();
     if (note.isNotEmpty) {
       await Provider.of<NoteProvider>(context, listen: false).addNote(note);
-      Navigator.pop(context); // Return to home after saving
+      Navigator.pop(context); 
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Note cannot be empty")),
